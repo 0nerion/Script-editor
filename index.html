@@ -2040,7 +2040,9 @@ function selectProject(el, key, subtitle) {
   // Force save immediately before switching
   if (_appReady) {
     clearTimeout(_saveTimer);
-    dbSave(serializeProjects()).catch(e => console.warn('Save failed:', e));
+    const _data = serializeProjects();
+    cacheWrite(_data).catch(() => {});
+    cloudSave(_data).catch(e => console.warn('Save failed:', e));
   }
 
   // Switch project
