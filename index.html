@@ -786,28 +786,55 @@
 ">
   <div style="width:340px;">
     <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#fff;margin-bottom:6px;">Script Editor</div>
-    <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#555;text-transform:uppercase;margin-bottom:36px;">Sign in to continue</div>
+    <div id="auth-subtitle" style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#555;text-transform:uppercase;margin-bottom:36px;">Sign in to continue</div>
+
     <input id="auth-email" type="email" placeholder="Email" onkeydown="if(event.key==='Enter')document.getElementById('auth-pass').focus()" style="
       width:100%;background:#1a1a18;border:1px solid #2a2a28;border-radius:6px;
       padding:12px 14px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;
-      font-family:'Inter',sans-serif;box-sizing:border-box;
-    ">
+      font-family:'Inter',sans-serif;box-sizing:border-box;transition:border-color 0.15s;
+    " onfocus="this.style.borderColor='#ffab4a'" onblur="this.style.borderColor='#2a2a28'">
+
     <input id="auth-pass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')handleSignIn()" style="
       width:100%;background:#1a1a18;border:1px solid #2a2a28;border-radius:6px;
-      padding:12px 14px;color:#fff;font-size:14px;outline:none;margin-bottom:16px;
-      font-family:'Inter',sans-serif;box-sizing:border-box;
-    ">
-    <div id="auth-error" style="display:none;color:#e07070;font-size:12px;margin-bottom:14px;"></div>
-    <button id="auth-btn" onclick="handleSignIn()" style="
+      padding:12px 14px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;
+      font-family:'Inter',sans-serif;box-sizing:border-box;transition:border-color 0.15s;
+    " onfocus="this.style.borderColor='#ffab4a'" onblur="this.style.borderColor='#2a2a28'">
+
+    <!-- Confirm password — signup only -->
+    <input id="auth-pass-confirm" type="password" placeholder="Confirm password" style="
+      width:100%;background:#1a1a18;border:1px solid #2a2a28;border-radius:6px;
+      padding:12px 14px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;
+      font-family:'Inter',sans-serif;box-sizing:border-box;transition:border-color 0.15s;
+      display:none;
+    " onfocus="this.style.borderColor='#ffab4a'" onblur="this.style.borderColor='#2a2a28'">
+
+    <div id="auth-error" style="display:none;font-size:12px;margin-bottom:14px;padding:10px 12px;border-radius:6px;background:#1a1a18;"></div>
+
+    <!-- Sign in button -->
+    <button id="auth-btn-signin" onclick="handleSignIn()" style="
       width:100%;background:#ffab4a;border:none;border-radius:6px;
       padding:12px;color:#1a1a1a;font-size:14px;font-weight:600;
       cursor:pointer;margin-bottom:10px;font-family:'Inter',sans-serif;
-    ">Sign in</button>
-    <button onclick="handleSignUp()" style="
-      width:100%;background:none;border:1px solid #2a2a28;border-radius:6px;
-      padding:12px;color:#888;font-size:13px;cursor:pointer;
-      font-family:'Inter',sans-serif;
-    ">Create account</button>
+      transition:background 0.15s;
+    " onmouseover="this.style.background='#ffc170'" onmouseout="this.style.background='#ffab4a'">Sign in</button>
+
+    <!-- Sign up button (hidden by default) -->
+    <button id="auth-btn-signup" onclick="handleSignUp()" style="
+      width:100%;background:#ffab4a;border:none;border-radius:6px;
+      padding:12px;color:#1a1a1a;font-size:14px;font-weight:600;
+      cursor:pointer;margin-bottom:10px;font-family:'Inter',sans-serif;
+      transition:background 0.15s;display:none;
+    " onmouseover="this.style.background='#ffc170'" onmouseout="this.style.background='#ffab4a'">Create account</button>
+
+    <!-- Toggle link -->
+    <div id="auth-toggle-signin" style="text-align:center;">
+      <span style="color:#555;font-size:12px;">No account yet? </span>
+      <button onclick="switchToSignUp()" style="background:none;border:none;color:#ffab4a;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;">Create one</button>
+    </div>
+    <div id="auth-toggle-signup" style="text-align:center;display:none;">
+      <span style="color:#555;font-size:12px;">Already have an account? </span>
+      <button onclick="switchToSignIn()" style="background:none;border:none;color:#ffab4a;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;">Sign in</button>
+    </div>
   </div>
 </div>
 
@@ -2381,16 +2408,43 @@ function hideAuthScreen() {
   document.getElementById('app-wrapper').style.display = 'flex';
 }
 
+function switchToSignUp() {
+  document.getElementById('auth-subtitle').textContent = 'Create your account';
+  document.getElementById('auth-pass').onkeydown = e => { if(e.key==='Enter') document.getElementById('auth-pass-confirm').focus(); };
+  document.getElementById('auth-pass-confirm').style.display = 'block';
+  document.getElementById('auth-btn-signin').style.display = 'none';
+  document.getElementById('auth-btn-signup').style.display = 'block';
+  document.getElementById('auth-toggle-signin').style.display = 'none';
+  document.getElementById('auth-toggle-signup').style.display = 'block';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function switchToSignIn() {
+  document.getElementById('auth-subtitle').textContent = 'Sign in to continue';
+  document.getElementById('auth-pass').onkeydown = e => { if(e.key==='Enter') handleSignIn(); };
+  document.getElementById('auth-pass-confirm').style.display = 'none';
+  document.getElementById('auth-btn-signin').style.display = 'block';
+  document.getElementById('auth-btn-signup').style.display = 'none';
+  document.getElementById('auth-toggle-signin').style.display = 'block';
+  document.getElementById('auth-toggle-signup').style.display = 'none';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function showAuthError(msg, success = false) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.color  = success ? '#7ec87e' : '#e07070';
+  el.style.background = success ? '#0f1f0f' : '#1f0f0f';
+  el.style.display = 'block';
+}
+
 async function handleSignIn() {
   const email = document.getElementById('auth-email').value.trim();
   const pass  = document.getElementById('auth-pass').value.trim();
-  const btn   = document.getElementById('auth-btn');
-  const errEl = document.getElementById('auth-error');
+  const btn   = document.getElementById('auth-btn-signin');
   if (!email || !pass) return;
-
+  document.getElementById('auth-error').style.display = 'none';
   btn.textContent = 'Signing in…'; btn.disabled = true;
-  errEl.style.display = 'none';
-
   try {
     const session = await signIn(email, pass);
     _supaSession = session;
@@ -2398,41 +2452,34 @@ async function handleSignIn() {
     hideAuthScreen();
     await initApp();
   } catch (e) {
-    errEl.textContent = e.message;
-    errEl.style.color = '#e07070';
-    errEl.style.display = 'block';
+    showAuthError(e.message);
     btn.textContent = 'Sign in'; btn.disabled = false;
   }
 }
 
 async function handleSignUp() {
-  const email = document.getElementById('auth-email').value.trim();
-  const pass  = document.getElementById('auth-pass').value.trim();
-  const btn   = document.getElementById('auth-btn');
+  const email   = document.getElementById('auth-email').value.trim();
+  const pass    = document.getElementById('auth-pass').value.trim();
+  const confirm = document.getElementById('auth-pass-confirm').value.trim();
+  const btn     = document.getElementById('auth-btn-signup');
   if (!email || !pass) return;
+  if (pass !== confirm) { showAuthError('Passwords do not match'); return; }
 
-  const errEl = document.getElementById('auth-error');
-  errEl.style.display = 'none';
-
+  btn.textContent = 'Creating…'; btn.disabled = true;
   try {
     const data = await signUp(email, pass);
-
-    // If Supabase returns a session directly (email confirm disabled) → log in immediately
     if (data?.access_token) {
       _supaSession = data;
       localStorage.setItem('supa_refresh', data.refresh_token);
       hideAuthScreen();
       await initApp();
     } else {
-      // Email confirm required
-      errEl.textContent = '✓ Account created — check your email to confirm, then sign in.';
-      errEl.style.color = '#7ec87e';
-      errEl.style.display = 'block';
+      showAuthError('✓ Account created — confirm your email then sign in.', true);
+      setTimeout(() => switchToSignIn(), 2000);
     }
   } catch (e) {
-    errEl.textContent = e.message;
-    errEl.style.color = '#e07070';
-    errEl.style.display = 'block';
+    showAuthError(e.message);
+    btn.textContent = 'Create account'; btn.disabled = false;
   }
 }
 
